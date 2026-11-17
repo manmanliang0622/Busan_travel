@@ -187,6 +187,8 @@ section{padding:30px 0 10px}
 
 /* ===== 待辦 / 住宿 / 清單 ===== */
 .two-col{display:grid;gap:18px}
+.two-col > *{min-width:0}
+.stay dd{min-width:0;overflow-wrap:anywhere}
 @media (min-width:760px){.two-col{grid-template-columns:1fr 1fr;align-items:start}}
 .progress{display:flex;align-items:center;gap:10px;margin-bottom:6px;font-size:14px}
 .bar{flex:1;height:16px;border:var(--line);border-radius:99px;overflow:hidden;background:var(--paper)}
@@ -226,6 +228,7 @@ section{padding:30px 0 10px}
 .stay .actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
 
 .pack-grid{display:grid;gap:18px}
+.pack-grid > *{min-width:0}
 @media (min-width:720px){.pack-grid{grid-template-columns:1fr 1fr}}
 .pack-summary{margin-bottom:16px}
 
@@ -447,7 +450,8 @@ footer small{opacity:.65}
       <div class="hero-text">
         <div class="hero-kicker">
           <span class="chip bg-yellow">2027 冬・韓國</span>
-          <span class="chip bg-water">港口城市</span>
+          <span class="chip bg-water">4 人同行</span>
+          <span class="chip bg-leaf">住奧西里亞</span>
         </div>
         <h1><span class="mark">釜山</span>小旅行</h1>
         <div class="ko">부산 여행</div>
@@ -665,7 +669,7 @@ footer small{opacity:.65}
                 <span class="lbl">分類</span>
                 <div class="seg" id="expCats" role="group" aria-label="分類"></div>
               </div>
-              <div><label class="lbl" for="expName">項目</label><input id="expName" maxlength="40" placeholder="例如：豬肉湯飯" required></div>
+              <div><label class="lbl" for="expName">項目</label><input id="expName" maxlength="40" placeholder="例如：油屋鰻魚飯" required></div>
               <div class="exp-row">
                 <div><label class="lbl" for="expAmt">金額</label><input id="expAmt" inputmode="decimal" placeholder="11000" required></div>
                 <div style="flex:.7"><label class="lbl" for="expCur">幣別</label><select id="expCur"><option value="KRW">₩ 韓元</option><option value="TWD">NT$ 台幣</option></select></div>
@@ -686,7 +690,7 @@ footer small{opacity:.65}
             <div class="exp-total" id="expTotal"></div>
             <div class="budget">
               <label for="expBudget">預算 NT$</label><input id="expBudget" inputmode="numeric" placeholder="未設定">
-              <label for="expPeople">人數</label><input id="expPeople" inputmode="numeric" style="width:56px" value="1">
+              <label for="expPeople">人數</label><input id="expPeople" inputmode="numeric" style="width:56px" value="4">
             </div>
             <div class="progress" id="expBudgetBar" style="margin-top:8px"></div>
             <ul class="cat-list" id="expCatList" aria-label="各分類花費"></ul>
@@ -840,88 +844,91 @@ const TRIP = {
   ],
 
   // 交通 types：plane 飛機・metro 地鐵・light 輕軌・train 列車・bus 公車・walk 步行・taxi 計程車・cable 纜車
+  // 行程來源：「釜山 4 人行程｜2027/2/12–2/16」文件（資料查詢日 2026-11-15）
   days: [
-    { date:'2027-02-12', title:'抵達釜山・西面宵夜', area:'西面', color:'coral', items:[
-      { time:'13:30', title:'桃園機場第一航廈報到', note:'提早 2 小時到，行動電源記得放隨身行李（台灣時間）' },
+    { date:'2027-02-12', title:'抵達釜山・入住奧西里亞', area:'奧西里亞', color:'coral', items:[
+      { time:'13:30', title:'桃園機場第一航廈報到', note:'提早 2 小時到，行動電源放隨身行李（台灣時間）' },
       { time:'15:40', title:'搭 CI186 前往釜山', move:{ types:['plane'], text:'約 2 小時 10 分' } },
-      { time:'18:50', title:'抵達金海機場', note:'入境、領行李，順便買 T-money 卡、開通網卡（韓國時間）' },
-      { time:'19:50', title:'前往西面', move:{ types:['light','metro'], text:'輕軌到沙上站轉 2 號線・約 50 分' } },
-      { time:'20:40', title:'飯店 Check-in', note:'放好行李就出門覓食', move:{ types:['walk'], text:'西面站步行約 5 分' } },
-      { time:'21:00', title:'西面豬肉湯飯街（宵夜）', must:true, note:'釜山代表美食，冬天晚上喝一碗超暖胃', move:{ types:['walk'], text:'約 10 分' }, map:'Seomyeon Dwaeji Gukbap Street' },
-      { time:'22:00', title:'便利商店補給', note:'買隔天早餐、飲料，早點休息', move:{ types:['walk'], text:'就在附近' } }
+      { time:'18:50', title:'抵達金海機場', note:'入境、領行李約 30–60 分鐘（估計）；開通網卡、買 T-money（韓國時間）' },
+      { time:'19:30', title:'出機場前往飯店', note:'4 人＋4 件大行李：建議用 Kakao T 叫大型計程車或分搭兩台，可請司機走光安大橋看夜景。備案：機場豪華巴士 1 號線（約 110 分）、市外巴士往 오시리아테마파크（19:30 開／21:44 到，9,500 韓元，2026 年時刻）', move:{ types:['taxi','bus'], text:'大型計程車或巴士' } },
+      { time:'21:30', title:'飯店入住', note:'預計 21:30–22:30 抵達，事前告知飯店晚到' },
+      { time:'22:30', title:'宵夜：Puradak 炸雞', must:true, note:'푸라닭（기장해안로 108），就在飯店旁；週五、六 13:00–24:00。備案：馬后雞（同棟，營業時間未查到）', move:{ types:['walk'], text:'飯店旁' }, map:'푸라닭 기장해안로 108' }
     ]},
-    { date:'2027-02-13', title:'海雲台・廣安里夜景', area:'海雲台', color:'yellow', items:[
-      { time:'09:30', title:'前往海雲台', move:{ types:['metro'], text:'2 號線 西面 → 中洞站・約 40 分' } },
-      { time:'10:30', title:'海雲台天空膠囊列車', must:true, note:'尾浦站 → 青沙浦，彩色小車廂沿著海岸慢慢開，建議先網路預約', move:{ types:['train'], text:'約 30 分' }, map:'Haeundae Blueline Park Mipo Station' },
-      { time:'12:00', title:'青沙浦踏石展望台＋烤貝午餐', note:'透明步道看海，再吃一盤現烤貝類', move:{ types:['walk'], text:'約 5 分' }, map:'Cheongsapo Daritdol Skywalk' },
-      { time:'14:00', title:'海雲台海水浴場散步', note:'沙灘、咖啡廳、The Bay 101', move:{ types:['bus','taxi'], text:'約 15 分' }, map:'Haeundae Beach' },
-      { time:'16:30', title:'前往廣安里', move:{ types:['metro'], text:'2 號線 海雲台 → 廣安站・約 20 分' } },
-      { time:'17:30', title:'廣安里海邊晚餐', note:'生魚片、炸雞配啤酒，坐窗邊看海', move:{ types:['walk'], text:'約 10 分' } },
-      { time:'19:00', title:'廣安大橋夜景＋無人機秀', must:true, tag:'週六限定', note:'燈光秀時間以官方公告為準', map:'Gwangalli Beach' },
-      { time:'21:00', title:'回西面', move:{ types:['metro'], text:'2 號線・約 25 分' } }
+    { date:'2027-02-13', title:'龍宮寺・樂天世界・廣安里', area:'奧西里亞', color:'yellow', items:[
+      { time:'08:45', title:'海東龍宮寺', must:true, note:'免費；寺廟開放 04:30–20:30，階梯多', move:{ types:['taxi'], text:'計程車' }, map:'Haedong Yonggungsa Temple' },
+      { time:'10:00', title:'釜山樂天世界冒險樂園', must:true, note:'週末 10:00–21:00；成人一日票 49,000 韓元（2026 年資料）；午餐在園內，玩到約 17:15', move:{ types:['taxi'], text:'計程車' }, map:'Lotte World Adventure Busan' },
+      { time:'17:30', title:'晚餐：松亭生魚片店', note:'송정횟집，16:00–23:00；Google 4.7；吃完可加點辣魚湯', move:{ types:['taxi'], text:'計程車' }, map:'송정횟집 부산' },
+      { time:'19:30', title:'前往廣安里', note:'大眾運輸替代：奧西里亞站搭東海線到 BEXCO，轉 2 號線到廣安站，5 號出口步行 10–13 分', move:{ types:['taxi'], text:'一台一般計程車' } },
+      { time:'21:00', title:'廣安里 M 無人機秀', must:true, tag:'週六限定', note:'冬季 19:00、21:00 兩場，約 12 分鐘，免費。目前公告到 2026/12/31，2027 年是否續辦未公布；雨天強風可能取消。海邊風大要穿暖', map:'Gwangalli Beach' },
+      { time:'21:45', title:'回飯店；宵夜馬后雞', note:'마후닭 오시리아점，與飯店同棟，營業時間未查到', move:{ types:['taxi'], text:'計程車' } }
     ]},
-    { date:'2027-02-14', title:'甘川洞・南浦洞', area:'南浦洞', color:'water', items:[
-      { time:'09:30', title:'甘川洞文化村', must:true, note:'山坡上的彩色小屋，和小王子與狐狸合照，記得買集章地圖', move:{ types:['metro','bus'], text:'1 號線到土城站，轉小巴 2 號・約 40 分' }, map:'Gamcheon Culture Village' },
-      { time:'12:30', title:'札嘎其市場午餐', note:'釜山最大海鮮市場，2 樓可以代客料理', move:{ types:['taxi'], text:'約 15 分' }, map:'Jagalchi Market' },
-      { time:'14:00', title:'BIFF 廣場・國際市場', note:'必吃黑糖堅果餅、魚糕', move:{ types:['walk'], text:'約 5 分' }, map:'BIFF Square Busan' },
-      { time:'15:30', title:'龍頭山公園・釜山塔', must:true, note:'登塔看整個港口', move:{ types:['walk'], text:'約 10 分（有手扶梯）' }, map:'Busan Tower' },
-      { time:'17:30', title:'光復路逛街', tag:'情人節', note:'2/14 剛好是情人節，街上很熱鬧，天黑後點燈最漂亮', move:{ types:['walk'], text:'約 5 分' }, map:'Gwangbok-ro Busan' },
-      { time:'19:00', title:'南浦洞晚餐', note:'烤牛腸、炸雞、路邊攤', move:{ types:['walk'], text:'就在附近' } },
-      { time:'20:30', title:'回西面', move:{ types:['metro'], text:'1 號線 南浦 → 西面・約 20 分' } }
+    { date:'2027-02-14', title:'滑車・Outlet・天空膠囊列車', area:'海雲臺・松亭', color:'water', items:[
+      { time:'09:50', title:'飯店出發', move:{ types:['taxi'], text:'計程車' } },
+      { time:'10:00', title:'Skyline Luge 釜山滑車', note:'스카이라인 루지（기장해안로 205）；每日 10:00–18:00，17:30 停止入場', map:'Skyline Luge Busan' },
+      { time:'11:00', title:'午餐：油屋（鰻魚飯）', must:true, note:'유옥，大阪風鰻魚飯；11:00–15:00；Google 5.0，常排隊，開門就到', move:{ types:['taxi'], text:'計程車' }, map:'유옥 부산' },
+      { time:'12:15', title:'Lotte Premium Outlet＋Lotte Mall＋Olive Young', note:'Outlet 10:30–21:00；Lotte Mall 1F 有 MUSINSA STANDARD；Olive Young 結帳可直接退稅', move:{ types:['taxi'], text:'計程車' }, map:'Lotte Premium Outlets Dongbusan' },
+      { time:'14:15', title:'前往尾浦站', move:{ types:['taxi'], text:'計程車' }, map:'Haeundae Blueline Park Mipo Station' },
+      { time:'15:00', title:'天空膠囊列車 尾浦 → 青沙浦', must:true, tag:'需預約', note:'約 30 分鐘；4 人一台 60,000 韓元；冬季 08:30–18:00。情人節週日，票一開賣就訂', move:{ types:['train'], text:'膠囊列車' } },
+      { time:'15:30', title:'青沙浦散步', move:{ types:['walk'], text:'步行' }, map:'Cheongsapo Daritdol Skywalk' },
+      { time:'16:30', title:'海邊列車 青沙浦 → 松亭', note:'冬季 09:00–19:00；青沙浦上車單次票 8,000 韓元／人', move:{ types:['train'], text:'海邊列車' } },
+      { time:'17:00', title:'松亭海水浴場看夕陽', move:{ types:['walk'], text:'步行' }, map:'Songjeong Beach' },
+      { time:'18:00', title:'晚餐：寧邊生魚片店（或牛張）', note:'영변횟집，帶骨生魚片；兩家營業時間都未查到，牛張 Google 查不到，請先確認', move:{ types:['walk'], text:'步行' }, map:'영변횟집 송정' },
+      { time:'19:45', title:'回飯店；Lotte Mart 買伴手禮', note:'Lotte Mart 東釜山營業到 22:00；5 天中唯一的伴手禮時間', move:{ types:['taxi'], text:'計程車' } }
     ]},
-    { date:'2027-02-15', title:'海東龍宮寺・影島', area:'機張・影島', color:'leaf', items:[
-      { time:'08:30', title:'前往海東龍宮寺', move:{ types:['metro','bus'], text:'地鐵轉東海線到 OSIRIA 站，再搭公車・約 70 分' } },
-      { time:'10:00', title:'海東龍宮寺', must:true, note:'蓋在海邊岩石上的寺廟，早上人比較少', map:'Haedong Yonggungsa Temple' },
-      { time:'12:00', title:'東釜山 Outlet 午餐＋逛街', move:{ types:['taxi'], text:'約 10 分' }, map:'Lotte Premium Outlets Dongbusan' },
-      { time:'15:00', title:'白淺灘文化村', note:'影島海崖邊的小村子，找間咖啡廳看海', move:{ types:['taxi'], text:'約 60 分' }, map:'Huinnyeoul Culture Village' },
-      { time:'17:00', title:'松島海上纜車', note:'坐透明車廂看夕陽', move:{ types:['taxi','cable'], text:'計程車約 15 分' }, map:'Songdo Marine Cable Car' },
-      { time:'19:00', title:'西面烤肉晚餐', note:'最後一晚，吃頓好的', move:{ types:['taxi'], text:'約 25 分' } },
-      { time:'20:30', title:'西面伴手禮採買', note:'蜂蜜奶油杏仁、海苔、泡麵、藥妝', move:{ types:['walk'], text:'地下街就在附近' } },
-      { time:'22:00', title:'回飯店打包行李', note:'明天是早上的班機，行李今晚先整理好' }
+    { date:'2027-02-15', title:'機張大蟹・西面逛街・醫美', area:'機張・西面', color:'leaf', items:[
+      { time:'10:15', title:'奧西里亞站 → 機張站', note:'往北 1 站；離峰約 25–30 分鐘一班', move:{ types:['train'], text:'東海線' } },
+      { time:'10:30', title:'大創機張店', note:'차성동로 63；10:00–22:00', move:{ types:['walk'], text:'步行' } },
+      { time:'11:00', title:'機張市場大王大蟹午餐', must:true, note:'기장시장대왕대게，11:00–22:00；評論提到帝王蟹約 10 萬韓元／公斤、松葉蟹約 6.3–7 萬，可議價；2F 代煮另收費。買前先問清楚每公斤價格與代煮費', move:{ types:['walk'], text:'步行' }, map:'기장시장대왕대게' },
+      { time:'12:15', title:'機張站 → 釜田站（西面）', note:'約 35 分鐘（估計）；也可 4 人搭計程車', move:{ types:['train'], text:'東海線' } },
+      { time:'13:00', title:'西面逛街', note:'MUSINSA STANDARD、이블래、남녀공학、KO&CLO、Samjung Tower、NC 百貨、西面地下街、Olive Young 西面 Town、大創', move:{ types:['walk'], text:'步行' }, map:'Seomyeon Busan' },
+      { time:'15:30', title:'西面醫美', tag:'需預約', note:'預約時告知 2/16 11:50 搭機，請醫師判斷療程是否適合；候選：JRYN、CELITA、Doctor Evers、Daybeau、西面新臉醫院', move:{ types:['walk'], text:'步行' } },
+      { time:'18:30', title:'回松亭', note:'術後建議搭計程車', move:{ types:['taxi'], text:'計程車' } },
+      { time:'19:15', title:'最後一頓晚餐：胡同家本店（五花肉）', note:'골목집 본점；週一 11:00–22:00（週日公休）', move:{ types:['walk'], text:'步行' }, map:'골목집 본점 송정' },
+      { time:'20:30', title:'回飯店打包', note:'隔天 07:00 出發，今晚把行李整理好', move:{ types:['taxi'], text:'計程車' } }
     ]},
-    { date:'2027-02-16', title:'早上的班機・回家', area:'金海機場', color:'coral', items:[
-      { time:'07:30', title:'早餐', note:'飯店附近吃碗熱湯，或便利商店簡單解決' },
-      { time:'08:30', title:'飯店退房', move:{ types:['walk'], text:'—' } },
-      { time:'08:45', title:'前往金海機場', note:'行李多的話可以改搭計程車，約 40 分', move:{ types:['metro','light'], text:'2 號線到沙上站轉輕軌・約 50 分' } },
-      { time:'09:50', title:'金海機場國際線報到', note:'辦理退稅、逛免稅店' },
+    { date:'2027-02-16', title:'11:50 起飛・回家', area:'金海機場', color:'coral', items:[
+      { time:'06:15', title:'起床、退房', note:'前一晚先打包' },
+      { time:'07:00', title:'出發前往機場', note:'市外巴士 오시리아테마파크 → 김해공항：07:06 開／08:36 到，下一班 07:36 開，9,500 韓元（2026/10 時刻表），上車點前一天先確認；或大型計程車 07:00–07:15 出發。週二早上尖峰可能塞車', move:{ types:['bus','taxi'], text:'市外巴士或大型計程車' } },
+      { time:'08:40', title:'抵達金海機場國際線', note:'報到、退稅、出境' },
       { time:'11:50', title:'搭 CI189 回台灣', move:{ types:['plane'], text:'約 2 小時 40 分' } },
       { time:'13:30', title:'抵達桃園第一航廈（台灣時間）', note:'旅程結束，記得整理照片' }
     ]}
   ],
 
   stay: {
-    name:'西面站周邊飯店（待訂）',
-    nameKo:'서면역 근처 호텔',
-    address:'釜山鎮區 西面一帶',
-    checkIn:'2/12（五）約 20:40 抵達',
-    checkOut:'2/16（二）08:30 出發去機場',
+    name:'Y COLLECTION by UH 平澤奧西里亞',
+    nameKo:'부산광역시 기장군 기장읍 동부산관광7로 17',
+    address:'釜山 機張郡 東釜山觀光園區（奧西里亞）',
+    checkIn:'2/12（五）約 21:30–22:30（先告知晚到）',
+    checkOut:'2/16（二）06:15 退房，07:00 出發',
     nights:4,
-    station:'西面站（1・2 號線）步行約 5 分',
+    station:'東海線 奧西里亞站',
     booking:'—',
-    phone:'—',
-    mapQuery:'Seomyeon Station Busan',
-    perks:['交通樞紐','地下街購物','宵夜很多']
+    phone:'+82 51-723-7275',
+    mapQuery:'부산광역시 기장군 기장읍 동부산관광7로 17',
+    perks:['4 人同行','近 Lotte Outlet・Lotte Mall','Puradak 炸雞就在旁邊']
   },
 
   todo: [
-    '吃一碗豬肉湯飯','札嘎其市場吃海鮮','吃黑糖堅果餅','吃三進魚糕',
-    '搭天空膠囊列車','看廣安大橋夜景','和甘川洞小王子合照','買伴手禮','寄一張明信片給自己'
+    '海東龍宮寺看海','釜山樂天世界玩一整天','廣安里無人機秀','Skyline Luge 滑車',
+    '天空膠囊列車＋海邊列車','油屋鰻魚飯','機張市場吃大蟹','松亭吃生魚片','西面逛街買衣服','Lotte Mart 買伴手禮'
   ],
 
   prep: [
-    '確認護照效期還有 6 個月以上','訂住宿','起飛前完成線上報到（CI186）',
-    '確認韓國入境規定（K-ETA、電子入境卡）','買旅遊平安險／不便險',
-    '換韓元、開通信用卡海外刷卡','買網卡或 eSIM','預約天空膠囊列車',
-    '下載 Naver Map、Kakao T、Papago','出發前一週查天氣','把行程分享給家人',
-    '出發前 1 個月到官網確認 K-ETA 豁免是否延長到 2027/2','抵達前 3 天內填 e-Arrival Card（官方免費），存好 QR Code',
-    '護照、機票、訂房確認截圖存手機並備份雲端','下載 Creatrip、Catch Table、KuliKuli、Subway Korea'
+    '確認護照效期還有 6 個月以上','出發前 1 個月到官網確認 K-ETA 豁免是否延長到 2027/2',
+    '抵達前 3 天內填 e-Arrival Card（官方免費），存好 QR Code','買旅遊平安險／不便險','買網卡或 eSIM',
+    '2027/1 中旬週二 07:00（韓國時間）搶 2/14 天空膠囊列車（4 人一台）',
+    '預約 2/15 下午西面醫美，告知隔天 11:50 搭機','告知飯店 2/12 約 22:00 入住，確認 2/16 退房與行李寄放',
+    '確認 2/16 早上大型計程車，或先看好 07:06 市外巴士上車點','每人下載 Kakao T、Naver Map、Olive Young、Papago',
+    '每人準備交通卡（T-money）','出發前一週確認廣安里無人機秀 2027 年公告','確認機場豪華巴士 1 號線 2 月時刻表',
+    '護照、機票、訂房確認截圖存手機並備份雲端','把行程分享給家人'
   ],
 
   pack: [
     { name:'證件錢包', color:'coral',  items:['護照','電子機票・訂房確認','韓元現金','信用卡','T-money 卡（也可到當地買）'] },
     { name:'保暖衣物', color:'water',  items:['厚外套','發熱衣・毛衣','圍巾・手套・毛帽','好走的鞋','睡衣・換洗衣物'] },
     { name:'3C 用品',  color:'yellow', items:['手機・充電線','行動電源（只能隨身帶）','轉接頭（韓國 220V 圓腳）','耳機'] },
-    { name:'盥洗保養', color:'leaf',   items:['牙刷牙膏（部分飯店不提供）','保濕乳液・護唇膏','暖暖包','小毛巾'] },
+    { name:'盥洗保養', color:'leaf',   items:['牙刷牙膏（部分飯店不提供）','保濕乳液・護唇膏','暖暖包','小毛巾','防曬・修護保養（醫美術後用）'] },
     { name:'常備藥品', color:'coral',  items:['感冒藥・止痛藥','腸胃藥','OK 繃'] }
   ]
 };
@@ -944,6 +951,11 @@ const STORE_KEY = 'busan-trip-2027';
 let state = { checked:{}, custom:{} };
 try { const s = JSON.parse(localStorage.getItem(STORE_KEY)); if (s) state = Object.assign(state, s); } catch(e) {}
 function save(){ try { localStorage.setItem(STORE_KEY, JSON.stringify(state)); } catch(e) {} }
+// v2：行程改為「4 人・奧西里亞」版本，待辦與出發前清單內容不同，清除舊勾選（行李、記帳保留）
+if (state.ver !== 2){
+  Object.keys(state.checked).forEach(k => { if (/^(todo|prep)-0-/.test(k)) delete state.checked[k]; });
+  state.ver = 2; save();
+}
 
 /* ---------- 甘川洞小屋 ---------- */
 (function houses(){
@@ -1035,7 +1047,7 @@ const tabs = [...tabsEl.querySelectorAll('.day-tab')];
 
 function itemHTML(it, i){
   const badges = (it.must ? '<span class="badge b-must">★ 必去</span>' : '') + (it.tag ? `<span class="badge b-tag">${esc(it.tag)}</span>` : '');
-  const move = it.move ? `<div class="tl-move">${it.move.types.map(tagHTML).join('')}${it.move.text && it.move.text!=='—' ? `<span class="move-text">${esc(it.move.text)}</span>` : ''}</div>` : '';
+  const move = it.move ? `<div class="tl-move">${it.move.types.map(tagHTML).join('')}${it.move.text && it.move.text!=='—' && !it.move.types.some(t => TRANSPORT[t].label === it.move.text) ? `<span class="move-text">${esc(it.move.text)}</span>` : ''}</div>` : '';
   const map = it.map ? `<a class="map-link" href="${mapUrl(it.map)}" target="_blank" rel="noopener">在地圖上看 ↗</a>` : '';
   return `<li class="tl-item${it.must ? ' is-must' : ''}" style="--i:${i}">
     <time class="tl-time">${it.time}</time><span class="tl-dot" aria-hidden="true"></span>
@@ -1329,9 +1341,9 @@ function renderFx(f, fromCache){
   $('#fxRate').innerHTML = `<div class="fx-rate"><span>1 台幣 ≈</span><b>${nf2.format(f.rate)}</b><span>韓元</span></div>
     <div class="fx-sub">1,000 韓元 ≈ ${nf2.format(1000/f.rate)} 台幣・10,000 韓元 ≈ ${nf0.format(10000/f.rate)} 台幣</div>`;
   $('#fxTable').innerHTML = [
-    ['一碗豬肉湯飯', 11000], ['地鐵單程（T-money）', 1600], ['黑糖堅果餅', 2000], ['天空膠囊列車（2 人單程）', 35000]
+    ['樂天世界一日票（成人）', 49000], ['天空膠囊列車（4 人一台）', 60000], ['海邊列車（每人）', 8000], ['市外巴士 機場線（每人）', 9500]
   ].map(([n,k]) => `<tr><td>${n}</td><td>₩${nf0.format(k)} ≈ NT$${nf0.format(k/f.rate)}</td></tr>`).join('');
-  $('#fxMeta').innerHTML = `匯率更新：${fmtTime(f.updated)}${fromCache?'（離線快取）':''}・來源：<a href="${f.link}" target="_blank" rel="noopener">${f.name}</a>。此為市場參考中間價，每日更新，實際換匯請以銀行或換錢所牌告為準；下方物價為大約估計。`;
+  $('#fxMeta').innerHTML = `匯率更新：${fmtTime(f.updated)}${fromCache?'（離線快取）':''}・來源：<a href="${f.link}" target="_blank" rel="noopener">${f.name}</a>。此為市場參考中間價，每日更新，實際換匯請以銀行或換錢所牌告為準；下方票價為 2026 年資料。`;
   convert('twd');
   document.dispatchEvent(new Event('fxrate'));
 }
@@ -1470,7 +1482,7 @@ const EXP_CATS = [
 ];
 const catLabel = id => (EXP_CATS.find(c => c.id === id) || EXP_CATS[5]).label;
 state.expenses = state.expenses || [];
-state.expMeta = state.expMeta || { budget:'', people:1 };
+state.expMeta = state.expMeta || { budget:'', people:4 };
 let expCat = 'food', expFilter = 'all';
 
 // 換算：韓元一律以目前匯率換成台幣；尚無匯率時用記帳當下保存的匯率
