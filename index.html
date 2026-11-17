@@ -212,6 +212,44 @@ section{padding:30px 0 10px}
 .ck-del{flex:none;width:32px;height:32px;border:2.5px solid var(--ink);border-radius:50%;background:var(--paper);font:inherit;font-size:18px;line-height:1;cursor:pointer;color:var(--ink)}
 .ck-del:hover{background:var(--coral)}
 .ck-del.is-armed{width:auto;border-radius:999px;padding:0 10px;font-size:13px;background:var(--coral)}
+
+/* ===== 購買清單 ===== */
+.buy-grid{display:grid;gap:18px}
+.buy-grid > *{min-width:0}
+@media (min-width:820px){.buy-grid{grid-template-columns:1fr 1.25fr;align-items:start}}
+.buy-pick{display:flex;align-items:center;gap:12px}
+.buy-pick .buy-thumb{width:64px;height:64px;flex:none}
+.buy-pick input[type=file]{position:absolute;opacity:0;width:1px;height:1px}
+.buy-pick .btn{font-size:14px;padding:6px 12px}
+.buy-list{list-style:none;margin:0;padding:0}
+.buy-item{display:grid;grid-template-columns:auto 56px minmax(0,1fr);gap:10px;align-items:start;padding:10px 0;border-bottom:2px dashed var(--soft)}
+.buy-item:last-child{border-bottom:0}
+.buy-ck{padding:0;min-height:56px;flex:none}
+.buy-thumb{width:56px;height:56px;padding:0;border:2.5px solid var(--ink);border-radius:14px;background:var(--sky);overflow:hidden;cursor:pointer;display:grid;place-items:center;color:var(--ink)}
+.buy-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.buy-thumb svg{width:26px;height:26px}
+.buy-thumb:focus-visible{outline:3px solid var(--water);outline-offset:2px}
+.buy-name{font-size:16px;line-height:1.35;overflow-wrap:anywhere}
+.is-bought .buy-name{text-decoration:line-through;text-decoration-thickness:2px;opacity:.5}
+.buy-sub{font-size:12.5px;opacity:.7;overflow-wrap:anywhere}
+.buy-price{display:flex;align-items:center;gap:4px;flex-wrap:wrap;margin-top:6px;font-size:14px}
+.buy-price input{width:96px;font:inherit;font-size:16px;color:var(--ink);padding:3px 8px;border:2.5px solid var(--ink);border-radius:10px;background:var(--paper);font-variant-numeric:tabular-nums}
+.buy-price input.qty{width:46px;text-align:center}
+.buy-price input:focus{outline:3px solid var(--water);outline-offset:1px}
+.buy-price .twd{font-size:13px;opacity:.75;font-variant-numeric:tabular-nums}
+.buy-links{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:6px;font-size:13px}
+.buy-links a{text-decoration:none;border-bottom:2px solid var(--water)}
+.buy-links .ck-del{margin-left:auto;width:30px;height:30px;font-size:16px}
+.buy-links .ck-del.is-armed{width:auto}
+.ck-title small{font-size:12px;opacity:.65}
+.buy-view{position:fixed;inset:0;z-index:80;background:rgba(62,58,57,.6);display:grid;place-items:center;
+  padding:max(16px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) max(16px, env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px))}
+.buy-view[hidden]{display:none}
+.buy-view figure{margin:0;width:min(100%,520px);background:var(--paper);border:var(--line);border-radius:22px;padding:10px;box-shadow:var(--pop)}
+.buy-view img{display:block;width:100%;max-height:62vh;object-fit:contain;border-radius:14px;background:var(--sky)}
+.buy-view figcaption{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:10px 4px 2px;font-size:16px}
+.buy-view figcaption .grow{flex:1 1 100%;min-width:0;font-size:18px}
+.buy-view .btn{font-size:14px;padding:6px 12px}
 .ck-add{display:flex;gap:8px;margin-top:12px}
 .ck-add input{flex:1;min-width:0;font:inherit;font-size:16px;color:var(--ink);padding:8px 12px;border:var(--line);border-radius:14px;background:var(--paper)}
 .ck-add input:focus{outline:3px solid var(--water);outline-offset:1px}
@@ -438,6 +476,7 @@ footer small{opacity:.65}
       <a href="#flight">航班</a>
       <a href="#plan">行程</a>
       <a href="#stay">住宿</a>
+      <a href="#buy">購物</a>
       <a href="#prep">出發前</a>
       <a href="#pack">行李</a>
       <a href="#apps-links">App</a>
@@ -764,6 +803,66 @@ footer small{opacity:.65}
           <div class="card-body" id="todoList"></div>
         </div>
         <div class="card stay" id="stayCard"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 購買清單 ===== -->
+  <section id="buy">
+    <div class="wrap">
+      <div class="sec-head">
+        <div class="sec-icon bg-yellow">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#3E3A39" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8h14l-1.2 12.5H6.2z"/><path d="M9 10V6.5a3 3 0 0 1 6 0V10"/></svg>
+        </div>
+        <div><h2>購買清單</h2><p>拍照記下想買的，填上韓國價格自動換算台幣</p></div>
+      </div>
+      <div class="buy-grid">
+        <div class="card">
+          <div class="card-head bg-yellow"><h3>加一樣想買的</h3></div>
+          <div class="card-body">
+            <form class="exp-form" id="buyForm" autocomplete="off">
+              <div class="buy-pick">
+                <span class="buy-thumb" id="buyPreview" aria-hidden="true"></span>
+                <label class="btn water" for="buyPhoto">📷 拍照／選照片</label>
+                <input type="file" id="buyPhoto" accept="image/*">
+              </div>
+              <div><label class="lbl" for="buyName">品名</label><input id="buyName" maxlength="40" placeholder="例如：蜂蜜奶油杏仁" required></div>
+              <div><label class="lbl" for="buyKo">韓文名稱（查價用，可留白）</label><input id="buyKo" maxlength="40" placeholder="例如：허니버터 아몬드" lang="ko"></div>
+              <div class="exp-row">
+                <div><label class="lbl" for="buyPlace">在哪買</label><select id="buyPlace"></select></div>
+              </div>
+              <div class="exp-row">
+                <div><label class="lbl" for="buyKrw">韓國價格 ₩</label><input id="buyKrw" inputmode="numeric" placeholder="可之後再填"></div>
+                <div style="flex:.55"><label class="lbl" for="buyQty">數量</label><input id="buyQty" inputmode="numeric" value="1"></div>
+              </div>
+              <div><label class="lbl" for="buyNote">備註（給誰、口味…）</label><input id="buyNote" maxlength="40" placeholder="例如：送同事"></div>
+              <button class="btn" type="submit">＋ 加入清單</button>
+              <p class="live-meta" id="buyHint" style="margin:0" aria-live="polite"></p>
+            </form>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head bg-coral"><h3>想買的東西</h3></div>
+          <div class="card-body">
+            <div class="exp-total" id="buyTotal"></div>
+            <div class="progress" style="margin:10px 0 4px"><div class="bar"><span id="buyBar"></span></div><span id="buyCount"></span></div>
+            <div id="buyList"></div>
+            <p class="live-meta">點「Naver 查價」「Coupang 查價」看韓國網路售價（實體店可能不同）。有填韓文名稱的話，會用韓文搜尋比較準。伴手禮只有 2/14 晚上在 Lotte Mart 有時間買；Olive Young 結帳可以直接退稅，記得帶護照。照片和清單只存在這台裝置的瀏覽器裡。</p>
+          </div>
+        </div>
+      </div>
+      <input type="file" id="buyPhotoLater" accept="image/*" class="sr-only" tabindex="-1" aria-hidden="true">
+      <div class="buy-view" id="buyView" hidden>
+        <figure role="dialog" aria-modal="true" aria-labelledby="buyViewName">
+          <img id="buyViewImg" alt="">
+          <figcaption>
+            <span class="grow" id="buyViewName"></span>
+            <button class="btn water" type="button" id="buyViewSwap">換照片</button>
+            <button class="btn" type="button" id="buyViewDrop">移除照片</button>
+            <button class="btn" type="button" id="buyViewClose">關閉</button>
+          </figcaption>
+        </figure>
       </div>
     </div>
   </section>
@@ -1716,6 +1815,218 @@ $('#expCsv').addEventListener('click', () => {
 });
 document.addEventListener('fxrate', () => renderExp());
 renderExp();
+
+/* ---------- 購買清單 ---------- */
+const BUY_PLACES = [
+  ['Olive Young','leaf'], ['Lotte Mart','yellow'], ['Outlet・Lotte Mall','water'],
+  ['西面逛街','coral'], ['大創','yellow'], ['機場免稅店','water'], ['其他','paper']
+];
+const BAG_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="#3E3A39" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 8h14l-1.2 12.5H6.2z"/><path d="M9 10V6.5a3 3 0 0 1 6 0V10"/></svg>';
+const PHOTO_KEY = 'busan-buy-photos-2027';
+let buyPhotos = {};
+try { buyPhotos = JSON.parse(localStorage.getItem(PHOTO_KEY)) || {}; } catch(e) {}
+function savePhotos(){ try { localStorage.setItem(PHOTO_KEY, JSON.stringify(buyPhotos)); return true; } catch(e) { return false; } }
+
+if (!Array.isArray(state.buy)){
+  // 範例：可以直接刪掉
+  state.buy = [
+    { id:'b1', name:'蜂蜜奶油杏仁', ko:'허니버터 아몬드', place:'Lotte Mart', krw:null, qty:1, note:'伴手禮', bought:false },
+    { id:'b2', name:'辛拉麵', ko:'신라면', place:'Lotte Mart', krw:null, qty:1, note:'伴手禮', bought:false },
+    { id:'b3', name:'韓國海苔', ko:'조미김', place:'Lotte Mart', krw:null, qty:1, note:'', bought:false },
+    { id:'b4', name:'面膜', ko:'마스크팩', place:'Olive Young', krw:null, qty:1, note:'', bought:false },
+    { id:'b5', name:'術後修護霜', ko:'재생크림', place:'Olive Young', krw:null, qty:1, note:'醫美後用', bought:false }
+  ];
+  save();
+}
+
+$('#buyPlace').innerHTML = BUY_PLACES.map(([p]) => `<option>${p}</option>`).join('');
+
+function shrinkPhoto(file){
+  return new Promise(resolve => {
+    if (!file) return resolve(null);
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => {
+      const s = Math.min(1, 480 / Math.max(img.naturalWidth, img.naturalHeight));
+      const c = document.createElement('canvas');
+      c.width = Math.round(img.naturalWidth * s); c.height = Math.round(img.naturalHeight * s);
+      c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+      URL.revokeObjectURL(url);
+      resolve(c.toDataURL('image/jpeg', .72));
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); resolve(null); };
+    img.src = url;
+  });
+}
+function setPhoto(id, data){
+  const old = buyPhotos[id];
+  if (data) buyPhotos[id] = data; else delete buyPhotos[id];
+  if (savePhotos()) return true;
+  if (old) buyPhotos[id] = old; else delete buyPhotos[id];
+  return false;
+}
+
+const buyLine = it => it.krw == null ? null : it.krw * (it.qty || 1);
+const buyTwd = it => buyLine(it) == null || !fxRate ? '' : `≈ NT$${nf0.format(buyLine(it) / fxRate)}`;
+
+function buyTotals(){
+  const items = state.buy;
+  const totK = items.reduce((s, it) => s + (buyLine(it) || 0), 0);
+  const unpriced = items.filter(it => it.krw == null).length;
+  const bought = items.filter(it => it.bought).length;
+  $('#buyTotal').innerHTML = `
+    <div class="cell bg-yellow"><small>預估總額（韓元）</small><b>₩${nf0.format(totK)}</b></div>
+    <div class="cell bg-water"><small>約台幣</small><b>${fxRate ? 'NT$' + nf0.format(totK / fxRate) : '—'}</b></div>`;
+  $('#buyBar').style.width = (items.length ? Math.round(bought / items.length * 100) : 0) + '%';
+  $('#buyCount').textContent = `已買 ${bought} / ${items.length}` + (unpriced ? `・${unpriced} 項沒填價格` : '');
+}
+
+function buyItemHTML(it){
+  const q = encodeURIComponent(it.ko || it.name);
+  const photo = buyPhotos[it.id];
+  const sub = [it.ko, it.note].filter(Boolean).map(esc).join('・');
+  return `<li class="buy-item${it.bought ? ' is-bought' : ''}">
+    <label class="ck-item buy-ck"><input type="checkbox" data-buy-ck="${it.id}"${it.bought ? ' checked' : ''}>
+      <span class="ck-box"><svg viewBox="0 0 16 16"><path d="M3.2 8.6l3 3 6.4-7.2"/></svg></span><span class="sr-only">已買「${esc(it.name)}」</span></label>
+    <button type="button" class="buy-thumb" data-buy-photo="${it.id}" aria-label="${photo ? `放大「${esc(it.name)}」的照片` : `幫「${esc(it.name)}」加照片`}">${photo ? `<img src="${photo}" alt="">` : BAG_SVG}</button>
+    <div class="buy-body">
+      <div class="buy-name">${esc(it.name)}</div>
+      ${sub ? `<div class="buy-sub">${sub}</div>` : ''}
+      <div class="buy-price">
+        <span>₩</span><input id="buyK-${it.id}" data-buy-krw="${it.id}" inputmode="numeric" placeholder="價格" aria-label="「${esc(it.name)}」韓國價格" value="${it.krw != null ? nf0.format(it.krw) : ''}">
+        <span>×</span><input id="buyQ-${it.id}" data-buy-qty="${it.id}" class="qty" inputmode="numeric" aria-label="「${esc(it.name)}」數量" value="${it.qty || 1}">
+        <span class="twd" id="buyT-${it.id}">${buyTwd(it)}</span>
+      </div>
+      <div class="buy-links">
+        <a href="https://search.shopping.naver.com/search/all?query=${q}" target="_blank" rel="noopener">Naver 查價 ↗</a>
+        <a href="https://www.coupang.com/np/search?q=${q}" target="_blank" rel="noopener">Coupang 查價 ↗</a>
+        <button class="ck-del" type="button" data-buy-del="${it.id}" aria-label="刪除「${esc(it.name)}」">×</button>
+      </div>
+    </div>
+  </li>`;
+}
+
+function renderBuy(){
+  const items = state.buy;
+  const placeOf = it => BUY_PLACES.some(([p]) => p === it.place) ? it.place : '其他';
+  $('#buyList').innerHTML = items.length
+    ? BUY_PLACES.map(([p, color]) => {
+        const arr = items.filter(it => placeOf(it) === p);
+        return arr.length ? `<div class="ck-group"><h4 class="ck-title"><span class="dot bg-${color}"></span>${esc(p)}<small>${arr.length} 項</small></h4>
+          <ul class="buy-list">${arr.map(buyItemHTML).join('')}</ul></div>` : '';
+      }).join('')
+    : `<p class="exp-empty">還沒有想買的東西，從「加一樣想買的」加第一項吧。</p>`;
+  buyTotals();
+}
+
+const findBuy = id => state.buy.find(it => it.id === id);
+
+/* 新增表單 */
+let buyNewPhoto = null;
+function showPreview(){ $('#buyPreview').innerHTML = buyNewPhoto ? `<img src="${buyNewPhoto}" alt="">` : BAG_SVG; }
+showPreview();
+$('#buyPhoto').addEventListener('change', async e => {
+  buyNewPhoto = await shrinkPhoto(e.target.files[0]);
+  $('#buyHint').textContent = e.target.files[0] && !buyNewPhoto ? '這張照片讀不到，換一張試試看' : '';
+  showPreview();
+});
+$('#buyForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const name = $('#buyName').value.trim();
+  if (!name) return;
+  const k = num($('#buyKrw').value), q = Math.max(1, Math.round(num($('#buyQty').value)) || 1);
+  const it = { id:'b' + Date.now(), name, ko:$('#buyKo').value.trim(), place:$('#buyPlace').value,
+               krw: isNaN(k) ? null : Math.round(k), qty:q, note:$('#buyNote').value.trim(), bought:false };
+  state.buy.push(it); save();
+  let msg = `已加入「${name}」`;
+  if (buyNewPhoto && !setPhoto(it.id, buyNewPhoto)) msg += '，但照片存不下（空間滿了），可以刪掉幾張舊照片再試';
+  buyNewPhoto = null; showPreview();
+  e.target.reset(); $('#buyQty').value = 1; $('#buyPlace').value = it.place;
+  $('#buyHint').textContent = msg;
+  renderBuy();
+});
+
+/* 清單操作 */
+const buyListEl = $('#buyList');
+buyListEl.addEventListener('change', e => {
+  const id = e.target.dataset.buyCk; if (!id) return;
+  const it = findBuy(id); if (!it) return;
+  it.bought = e.target.checked; save();
+  e.target.closest('.buy-item').classList.toggle('is-bought', it.bought);
+  buyTotals();
+});
+buyListEl.addEventListener('input', e => {
+  const t = e.target, id = t.dataset.buyKrw || t.dataset.buyQty; if (!id) return;
+  const it = findBuy(id); if (!it) return;
+  const v = num(t.value);
+  if (t.dataset.buyKrw) it.krw = isNaN(v) ? null : Math.round(v);
+  else it.qty = isNaN(v) || v < 1 ? 1 : Math.round(v);
+  save();
+  $('#buyT-' + id).textContent = buyTwd(it);
+  buyTotals();
+});
+buyListEl.addEventListener('focusout', e => {
+  const id = e.target.dataset.buyKrw; if (!id) return;
+  const it = findBuy(id); if (it && it.krw != null) e.target.value = nf0.format(it.krw);
+});
+
+let buyPhotoFor = null;
+buyListEl.addEventListener('click', e => {
+  const del = e.target.closest('[data-buy-del]');
+  if (del){
+    const id = del.dataset.buyDel, it = findBuy(id);
+    if (del.dataset.armed !== '1'){
+      del.dataset.armed = '1'; del.textContent = '刪除？'; del.classList.add('is-armed');
+      del.setAttribute('aria-label', `再按一次刪除「${it ? it.name : ''}」`);
+      setTimeout(() => { if (del.isConnected){ del.dataset.armed = ''; del.textContent = '×'; del.classList.remove('is-armed'); } }, 3000);
+      return;
+    }
+    state.buy = state.buy.filter(x => x.id !== id); save();
+    if (buyPhotos[id]){ delete buyPhotos[id]; savePhotos(); }
+    renderBuy();
+    return;
+  }
+  const th = e.target.closest('[data-buy-photo]');
+  if (th){
+    const id = th.dataset.buyPhoto;
+    if (buyPhotos[id]) openBuyView(id);
+    else { buyPhotoFor = id; $('#buyPhotoLater').click(); }
+  }
+});
+$('#buyPhotoLater').addEventListener('change', async e => {
+  const id = buyPhotoFor, file = e.target.files[0];
+  e.target.value = '';
+  if (!id || !file) return;
+  const data = await shrinkPhoto(file);
+  if (!data || !setPhoto(id, data)) $('#buyHint').textContent = data ? '照片存不下（空間滿了），可以刪掉幾張舊照片再試' : '這張照片讀不到，換一張試試看';
+  renderBuy();
+  if ($('#buyView').hidden === false) openBuyView(id);
+});
+
+/* 放大照片（給店員看） */
+let buyViewId = null, buyViewFrom = null;
+function openBuyView(id){
+  const it = findBuy(id); if (!it || !buyPhotos[id]) return closeBuyView();
+  buyViewId = id; buyViewFrom = buyViewFrom || document.activeElement;
+  $('#buyViewImg').src = buyPhotos[id];
+  $('#buyViewImg').alt = it.name;
+  $('#buyViewName').textContent = it.ko ? `${it.name}・${it.ko}` : it.name;
+  $('#buyView').hidden = false;
+  $('#buyViewClose').focus();
+}
+function closeBuyView(){
+  $('#buyView').hidden = true; buyViewId = null;
+  if (buyViewFrom && buyViewFrom.isConnected) buyViewFrom.focus();
+  buyViewFrom = null;
+}
+$('#buyViewClose').addEventListener('click', closeBuyView);
+$('#buyView').addEventListener('click', e => { if (e.target.id === 'buyView') closeBuyView(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && !$('#buyView').hidden) closeBuyView(); });
+$('#buyViewSwap').addEventListener('click', () => { buyPhotoFor = buyViewId; $('#buyPhotoLater').click(); });
+$('#buyViewDrop').addEventListener('click', () => { setPhoto(buyViewId, null); closeBuyView(); renderBuy(); });
+
+document.addEventListener('fxrate', renderBuy);
+renderBuy();
 
 /* ---------- 選單目前位置 ---------- */
 const navLinks = [...document.querySelectorAll('#navLinks a')];
