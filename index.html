@@ -440,6 +440,7 @@ footer small{opacity:.65}
       <a href="#stay">住宿</a>
       <a href="#prep">出發前</a>
       <a href="#pack">行李</a>
+      <a href="#apps-links">App</a>
     </nav>
   </div>
 </header>
@@ -609,7 +610,7 @@ footer small{opacity:.65}
         <div class="sec-icon bg-coral">
           <svg viewBox="0 0 24 24" fill="none" stroke="#3E3A39" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h9v7H8l-4 3z"/><path d="M13 9h7v7l-3-2h-4z" fill="#FFFCF6"/></svg>
         </div>
-        <div><h2>旅遊工具</h2><p>翻譯、常用韓文、推薦 App 與官方入境連結</p></div>
+        <div><h2>旅遊工具</h2><p>中韓翻譯與常用韓文</p></div>
       </div>
       <div class="tools-grid">
         <div class="card">
@@ -634,19 +635,6 @@ footer small{opacity:.65}
         <div class="card">
           <div class="card-head bg-leaf"><h3>常用韓文（離線可用）</h3></div>
           <div class="card-body"><ul class="phrases" id="phrases"></ul></div>
-        </div>
-      </div>
-
-      <div class="card" style="margin-top:18px">
-        <div class="card-head bg-water"><h3>推薦 App</h3></div>
-        <div class="card-body">
-          <div class="apps" id="apps"></div>
-          <p class="live-meta">以上 App 沒有公開給一般開發者使用的 API，所以這裡只放官方網站與商店搜尋連結，無法把它們的資料直接嵌進網頁。iPhone 請在 App Store 搜尋 App 名稱。</p>
-          <div class="gov">
-            <h4 style="font-size:17px">官方入境連結（皆為免費）</h4>
-            <ul id="gov"></ul>
-            <div class="warn"><b>注意 K-ETA：</b>台灣旅客的 K-ETA 豁免目前公告的期限可能在 2027/2 出發日之前就結束。出發前 1 個月請到 K-ETA 官網確認是否已延長，沒延長就要提早申請（審核需要時間）。電子入境卡（e-Arrival Card）請認明 <b>.go.kr</b> 官方網址，搜尋結果裡有收費代辦網站。</div>
-          </div>
         </div>
       </div>
     </div>
@@ -804,6 +792,30 @@ footer small{opacity:.65}
       </div>
       <div class="card pack-summary"><div class="card-body" id="packSummary"></div></div>
       <div class="pack-grid" id="packList"></div>
+    </div>
+  </section>
+
+  <!-- ===== 推薦 App + 官方入境連結 ===== -->
+  <section id="apps-links">
+    <div class="wrap">
+      <div class="sec-head">
+        <div class="sec-icon bg-water">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#3E3A39" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="6.5" y="2.5" width="11" height="19" rx="2.8"/><path d="M10.5 18.5h3"/></svg>
+        </div>
+        <div><h2>推薦 App & 官方連結</h2><p>出發前先下載好，入境資料認明官方網站</p></div>
+      </div>
+      <div class="card">
+          <div class="card-head bg-water"><h3>推薦 App</h3></div>
+          <div class="card-body">
+            <div class="apps" id="apps"></div>
+            <p class="live-meta">以上 App 沒有公開給一般開發者使用的 API，所以這裡只放官方網站與商店搜尋連結，無法把它們的資料直接嵌進網頁。iPhone 請在 App Store 搜尋 App 名稱。</p>
+            <div class="gov">
+              <h4 style="font-size:17px">官方入境連結（皆為免費）</h4>
+              <ul id="gov"></ul>
+              <div class="warn"><b>注意 K-ETA：</b>台灣旅客的 K-ETA 豁免目前公告的期限可能在 2027/2 出發日之前就結束。出發前 1 個月請到 K-ETA 官網確認是否已延長，沒延長就要提早申請（審核需要時間）。電子入境卡（e-Arrival Card）請認明 <b>.go.kr</b> 官方網址，搜尋結果裡有收費代辦網站。</div>
+            </div>
+          </div>
+        </div>
     </div>
   </section>
 </main>
@@ -1725,6 +1737,12 @@ if ('IntersectionObserver' in window){
   document.querySelectorAll('main section[id]').forEach(s => io.observe(s));
 }
 setActive('home');
+// 最後一個區塊太短，捲不到觀察範圍：捲到底時直接標示最後一個；點選單也立即標示
+const lastSec = [...document.querySelectorAll('main section[id]')].pop();
+window.addEventListener('scroll', () => {
+  if (innerHeight + scrollY >= document.documentElement.scrollHeight - 4) setActive(lastSec.id);
+}, { passive:true });
+navLinks.forEach(a => a.addEventListener('click', () => setActive(a.getAttribute('href').slice(1))));
 </script>
 </body>
 </html>
