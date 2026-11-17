@@ -320,6 +320,43 @@ footer small{opacity:.65}
 .gov li{margin:6px 0}
 .warn{border:2.5px dashed var(--ink);border-radius:14px;padding:10px 12px;background:#FBE3DE;font-size:14px;margin-top:10px}
 
+/* ===== 記帳 ===== */
+.exp-grid{display:grid;gap:18px}
+@media (min-width:820px){.exp-grid{grid-template-columns:1fr 1.1fr;align-items:start}}
+.exp-form{display:grid;gap:10px}
+.exp-row{display:flex;gap:8px}
+.exp-row > *{flex:1;min-width:0}
+.exp-form input,.exp-form select{width:100%;font:inherit;font-size:16px;color:var(--ink);padding:8px 10px;border:var(--line);border-radius:14px;background:var(--paper)}
+.exp-form input:focus,.exp-form select:focus{outline:3px solid var(--water);outline-offset:1px}
+.exp-form .lbl{font-size:13px;opacity:.75;display:block;margin-bottom:3px}
+.seg{display:flex;flex-wrap:wrap;gap:6px}
+.seg button{font:inherit;font-size:14px;color:var(--ink);padding:4px 11px;border:2.5px solid var(--ink);border-radius:999px;background:var(--paper);cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--yellow);box-shadow:0 3px 0 var(--ink)}
+.exp-total{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.exp-total .cell{border:var(--line);border-radius:16px;padding:8px 10px;line-height:1.25}
+.exp-total small{font-size:12.5px;opacity:.8;display:block}
+.exp-total b{font-weight:400;font-size:24px;font-variant-numeric:tabular-nums}
+.budget{display:flex;align-items:center;gap:8px;margin-top:12px;font-size:14px;flex-wrap:wrap}
+.budget input{width:110px;font:inherit;font-size:15px;color:var(--ink);padding:4px 8px;border:2.5px solid var(--ink);border-radius:10px;background:var(--paper)}
+.bar.over span{background:var(--coral)}
+.cat-list{list-style:none;margin:12px 0 0;padding:0;font-size:14px}
+.cat-list li{display:grid;grid-template-columns:3em 1fr 8.5em;gap:8px;align-items:center;padding:3px 0}
+.cat-list .track{height:10px;border-radius:0 4px 4px 0;background:var(--soft);overflow:hidden}
+.cat-list .fill{display:block;height:100%;background:var(--water);border-radius:0 4px 4px 0}
+.cat-list .v{font-variant-numeric:tabular-nums;text-align:right}
+.exp-filter{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding:2px 2px 8px}
+.exp-filter::-webkit-scrollbar{display:none}
+.exp-filter button{flex:none}
+.exp-list{list-style:none;margin:0;padding:0}
+.exp-day{font-size:14px;opacity:.8;margin:10px 0 2px;display:flex;justify-content:space-between}
+.exp-item{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:2px dashed var(--soft)}
+.exp-item .nm{flex:1;min-width:0;line-height:1.3}
+.exp-item .nm small{display:block;font-size:12px;opacity:.7}
+.exp-item .amt{text-align:right;font-variant-numeric:tabular-nums;line-height:1.3}
+.exp-item .amt small{display:block;font-size:12px;opacity:.7}
+.exp-empty{font-size:14px;opacity:.75;padding:10px 0}
+.exp-tools{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+
 /* ===== 插圖動畫 ===== */
 .a-float{animation:float 4.2s ease-in-out infinite}
 .a-float.d2{animation-duration:5s;animation-delay:-1.4s}
@@ -393,6 +430,7 @@ footer small{opacity:.65}
       <a href="#home">首頁</a>
       <a href="#live">天氣匯率</a>
       <a href="#tools">工具</a>
+      <a href="#money">記帳</a>
       <a href="#flight">航班</a>
       <a href="#plan">行程</a>
       <a href="#stay">住宿</a>
@@ -609,6 +647,67 @@ footer small{opacity:.65}
     </div>
   </section>
 
+  <!-- ===== 記帳 ===== -->
+  <section id="money">
+    <div class="wrap">
+      <div class="sec-head">
+        <div class="sec-icon bg-leaf">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#3E3A39" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="13" rx="3"/><path d="M3 10h18"/><circle cx="16.5" cy="14.5" r="1.6" fill="#3E3A39" stroke="none"/><path d="M6 6l9-3 1.5 3"/></svg>
+        </div>
+        <div><h2>旅費記帳</h2><p>韓元、台幣都能記，依目前匯率自動換算</p></div>
+      </div>
+      <div class="exp-grid">
+        <div class="card">
+          <div class="card-head bg-yellow"><h3>記一筆</h3></div>
+          <div class="card-body">
+            <form class="exp-form" id="expForm" autocomplete="off">
+              <div>
+                <span class="lbl">分類</span>
+                <div class="seg" id="expCats" role="group" aria-label="分類"></div>
+              </div>
+              <div><label class="lbl" for="expName">項目</label><input id="expName" maxlength="40" placeholder="例如：豬肉湯飯" required></div>
+              <div class="exp-row">
+                <div><label class="lbl" for="expAmt">金額</label><input id="expAmt" inputmode="decimal" placeholder="11000" required></div>
+                <div style="flex:.7"><label class="lbl" for="expCur">幣別</label><select id="expCur"><option value="KRW">₩ 韓元</option><option value="TWD">NT$ 台幣</option></select></div>
+              </div>
+              <div class="exp-row">
+                <div><label class="lbl" for="expDate">日期</label><select id="expDate"></select></div>
+                <div><label class="lbl" for="expPay">付款</label><select id="expPay"><option>現金</option><option>信用卡</option><option>T-money</option><option>行動支付</option></select></div>
+              </div>
+              <button class="btn" type="submit">＋ 記下來</button>
+              <p class="live-meta" id="expHint" style="margin:0"></p>
+            </form>
+          </div>
+        </div>
+
+        <div class="card" aria-live="polite">
+          <div class="card-head bg-leaf"><h3>花費總覽</h3></div>
+          <div class="card-body">
+            <div class="exp-total" id="expTotal"></div>
+            <div class="budget">
+              <label for="expBudget">預算 NT$</label><input id="expBudget" inputmode="numeric" placeholder="未設定">
+              <label for="expPeople">人數</label><input id="expPeople" inputmode="numeric" style="width:56px" value="1">
+            </div>
+            <div class="progress" id="expBudgetBar" style="margin-top:8px"></div>
+            <ul class="cat-list" id="expCatList" aria-label="各分類花費"></ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:18px">
+        <div class="card-head bg-water"><h3>明細</h3></div>
+        <div class="card-body">
+          <div class="exp-filter seg" id="expFilter" role="group" aria-label="篩選日期"></div>
+          <ul class="exp-list" id="expList"></ul>
+          <div class="exp-tools">
+            <button class="btn water" type="button" id="expCsv">匯出 CSV</button>
+          </div>
+          <p class="live-meta">台幣換算使用頁面上方的最新匯率（市場參考價），和信用卡帳單實際金額會有些差異。紀錄只存在這台裝置的瀏覽器，換手機或清除瀏覽資料會不見，回國前可以先匯出 CSV 備份。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- ===== 航班 ===== -->
   <section id="flight">
     <div class="wrap">
@@ -716,7 +815,7 @@ footer small{opacity:.65}
     </g>
   </svg>
   <p>즐거운 여행 되세요！祝旅途愉快</p>
-  <small>勾選紀錄只會存在這台裝置的瀏覽器裡</small>
+  <small>勾選與記帳紀錄只會存在這台裝置的瀏覽器裡</small>
 </footer>
 
 <script>
@@ -1234,6 +1333,7 @@ function renderFx(f, fromCache){
   ].map(([n,k]) => `<tr><td>${n}</td><td>₩${nf0.format(k)} ≈ NT$${nf0.format(k/f.rate)}</td></tr>`).join('');
   $('#fxMeta').innerHTML = `匯率更新：${fmtTime(f.updated)}${fromCache?'（離線快取）':''}・來源：<a href="${f.link}" target="_blank" rel="noopener">${f.name}</a>。此為市場參考中間價，每日更新，實際換匯請以銀行或換錢所牌告為準；下方物價為大約估計。`;
   convert('twd');
+  document.dispatchEvent(new Event('fxrate'));
 }
 function convert(from){
   if (!fxRate) return;
@@ -1362,6 +1462,122 @@ $('#gov').innerHTML = [
   ['K-ETA 電子旅行許可','https://www.k-eta.go.kr/','確認豁免期限'],
   ['Q-CODE 檢疫申報','https://cov19ent.kdca.go.kr/','台灣直飛通常不需要，出發前再確認']
 ].map(([n,u,t]) => `<li><a href="${u}" target="_blank" rel="noopener">${n}</a> <small style="opacity:.75">— ${t}</small></li>`).join('');
+
+/* ---------- 記帳 ---------- */
+const EXP_CATS = [
+  { id:'food', label:'餐飲' }, { id:'move', label:'交通' }, { id:'shop', label:'購物' },
+  { id:'ticket', label:'門票' }, { id:'stay', label:'住宿' }, { id:'other', label:'其他' }
+];
+const catLabel = id => (EXP_CATS.find(c => c.id === id) || EXP_CATS[5]).label;
+state.expenses = state.expenses || [];
+state.expMeta = state.expMeta || { budget:'', people:1 };
+let expCat = 'food', expFilter = 'all';
+
+// 換算：韓元一律以目前匯率換成台幣；尚無匯率時用記帳當下保存的匯率
+const expRate = e => fxRate || e.rate || null;
+const toTWD = e => e.cur === 'TWD' ? e.amt : (expRate(e) ? e.amt / expRate(e) : null);
+const toKRW = e => e.cur === 'KRW' ? e.amt : (expRate(e) ? e.amt * expRate(e) : null);
+
+$('#expCats').innerHTML = EXP_CATS.map(c => `<button type="button" data-cat="${c.id}" aria-pressed="${c.id===expCat}">${c.label}</button>`).join('');
+$('#expCats').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  expCat = b.dataset.cat;
+  $('#expCats').querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+});
+
+// 日期選單：旅行日期＋今天（若不在旅行期間）
+const todayStr = (() => { const d = new Date(); return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`; })();
+const tripDates = TRIP.days.map(d => d.date);
+const dateOpts = [...new Set([...tripDates, todayStr])].sort();
+$('#expDate').innerHTML = dateOpts.map(d => {
+  const i = tripDates.indexOf(d);
+  return `<option value="${d}">${md(d)}（${wd(d)}）${i >= 0 ? ' D' + (i+1) : ''}</option>`;
+}).join('');
+$('#expDate').value = tripDates.includes(todayStr) ? todayStr : (todayStr < tripDates[0] ? todayStr : tripDates[0]);
+
+$('#expForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const name = $('#expName').value.trim(), amt = num($('#expAmt').value);
+  if (!name || !(amt > 0)){ $('#expHint').textContent = '請填項目名稱和大於 0 的金額'; return; }
+  state.expenses.push({ id:'e' + Date.now(), name, amt, cur:$('#expCur').value, cat:expCat,
+    date:$('#expDate').value, pay:$('#expPay').value, rate:fxRate || null });
+  save(); renderExp();
+  $('#expName').value = ''; $('#expAmt').value = '';
+  $('#expHint').textContent = `已記下「${name}」`;
+  $('#expName').focus();
+});
+$('#expList').addEventListener('click', e => {
+  const b = e.target.closest('[data-exp-del]'); if (!b) return;
+  const it = state.expenses.find(x => x.id === b.dataset.expDel);
+  if (it && confirm(`刪除「${it.name}」？`)){ state.expenses = state.expenses.filter(x => x !== it); save(); renderExp(); }
+});
+$('#expFilter').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  expFilter = b.dataset.f; renderExp();
+});
+$('#expBudget').value = state.expMeta.budget;
+$('#expPeople').value = state.expMeta.people;
+['expBudget','expPeople'].forEach(id => $('#'+id).addEventListener('input', () => {
+  state.expMeta.budget = $('#expBudget').value.replace(/[^\d]/g,'');
+  state.expMeta.people = Math.max(1, parseInt($('#expPeople').value, 10) || 1);
+  save(); renderExp(true);
+}));
+
+const fmtTWD = v => v == null ? '—' : 'NT$' + nf0.format(v);
+const fmtKRW = v => v == null ? '—' : '₩' + nf0.format(v);
+const sum = (arr, f) => arr.reduce((a, e) => { const v = f(e); return v == null ? a : a + v; }, 0);
+
+function renderExp(summaryOnly){
+  const all = state.expenses;
+  const tw = sum(all, toTWD), kr = sum(all, toKRW), people = state.expMeta.people || 1;
+  const missing = all.some(e => toTWD(e) == null);
+  $('#expTotal').innerHTML = `
+    <div class="cell bg-coral"><small>總花費（台幣）</small><b>${fmtTWD(tw)}</b></div>
+    <div class="cell bg-water"><small>總花費（韓元）</small><b>${fmtKRW(kr)}</b></div>
+    <div class="cell"><small>每人平均</small><b>${fmtTWD(tw / people)}</b></div>
+    <div class="cell"><small>筆數</small><b>${all.length}</b></div>`;
+  const budget = parseInt(state.expMeta.budget, 10);
+  $('#expBudgetBar').innerHTML = budget > 0
+    ? `<div class="bar${tw > budget ? ' over' : ''}"><span style="width:${Math.min(100, tw / budget * 100)}%"></span></div>
+       <span>${tw > budget ? '超出 ' + fmtTWD(tw - budget) : '剩 ' + fmtTWD(budget - tw)}</span>`
+    : '';
+  const byCat = EXP_CATS.map(c => ({ ...c, v: sum(all.filter(e => e.cat === c.id), toTWD) })).filter(c => c.v > 0).sort((a,b) => b.v - a.v);
+  const max = byCat.length ? byCat[0].v : 0;
+  $('#expCatList').innerHTML = byCat.length
+    ? byCat.map(c => `<li title="${c.label} ${fmtTWD(c.v)}（${Math.round(c.v / tw * 100)}%）"><span>${c.label}</span><span class="track"><span class="fill" style="width:${c.v / max * 100}%"></span></span><span class="v">${fmtTWD(c.v)}・${Math.round(c.v / tw * 100)}%</span></li>`).join('')
+    : `<li class="exp-empty" style="display:block">還沒有花費紀錄</li>`;
+  if (missing) $('#expCatList').insertAdjacentHTML('beforeend', `<li class="exp-empty" style="display:block">部分韓元紀錄尚未取得匯率，暫不計入台幣合計。</li>`);
+  if (summaryOnly) return;
+
+  const days = [...new Set(all.map(e => e.date))].sort();
+  if (expFilter !== 'all' && !days.includes(expFilter)) expFilter = 'all';
+  $('#expFilter').innerHTML = [['all','全部'], ...days.map(d => [d, `${md(d)}（${wd(d)}）`])]
+    .map(([f, t]) => `<button type="button" data-f="${f}" aria-pressed="${f === expFilter}">${t}</button>`).join('');
+  const shown = days.filter(d => expFilter === 'all' || d === expFilter);
+  $('#expList').innerHTML = shown.length ? shown.slice().reverse().map(d => {
+    const items = all.filter(e => e.date === d).slice().reverse();
+    return `<li><div class="exp-day"><span>${md(d)}（${wd(d)}）</span><span>小計 ${fmtTWD(sum(items, toTWD))}</span></div>
+      <ul class="exp-list">${items.map(e => `<li class="exp-item">
+        <span class="chip">${catLabel(e.cat)}</span>
+        <span class="nm">${esc(e.name)}<small>${esc(e.pay)}</small></span>
+        <span class="amt">${e.cur === 'KRW' ? fmtKRW(e.amt) : fmtTWD(e.amt)}<small>≈ ${e.cur === 'KRW' ? fmtTWD(toTWD(e)) : fmtKRW(toKRW(e))}</small></span>
+        <button class="ck-del" type="button" data-exp-del="${e.id}" aria-label="刪除「${esc(e.name)}」">×</button></li>`).join('')}</ul></li>`;
+  }).join('') : `<li class="exp-empty">還沒有紀錄，從左邊記下第一筆吧。</li>`;
+}
+
+$('#expCsv').addEventListener('click', () => {
+  if (!state.expenses.length){ alert('還沒有紀錄可以匯出'); return; }
+  const q = v => `"${String(v).replace(/"/g,'""')}"`;
+  const rows = [['日期','分類','項目','付款','原幣金額','幣別','台幣約','韓元約']]
+    .concat(state.expenses.map(e => [e.date, catLabel(e.cat), e.name, e.pay, e.amt, e.cur,
+      toTWD(e) == null ? '' : Math.round(toTWD(e)), toKRW(e) == null ? '' : Math.round(toKRW(e))]));
+  const blob = new Blob(['﻿' + rows.map(r => r.map(q).join(',')).join('\r\n')], { type:'text/csv;charset=utf-8' });
+  const a = Object.assign(document.createElement('a'), { href: URL.createObjectURL(blob), download: 'busan-expenses.csv' });
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+});
+document.addEventListener('fxrate', () => renderExp());
+renderExp();
 
 /* ---------- 選單目前位置 ---------- */
 const navLinks = [...document.querySelectorAll('#navLinks a')];
