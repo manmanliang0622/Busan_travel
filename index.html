@@ -113,7 +113,7 @@ section{padding:30px 0 10px}
 .route{text-align:center;min-width:0}
 .route svg{width:100%;max-width:140px;height:auto;display:block;margin:0 auto}
 .route .dur{font-size:12px;opacity:.8}
-.ticket-foot{position:relative;border-top:3px dashed var(--ink);display:grid;grid-template-columns:repeat(4,1fr);padding:12px 10px 14px;text-align:center}
+.ticket-foot{position:relative;border-top:3px dashed var(--ink);display:grid;grid-template-columns:repeat(3,1fr);padding:12px 10px 14px;text-align:center}
 .ticket-foot::before,.ticket-foot::after{
   content:"";position:absolute;top:-14px;width:24px;height:24px;border:var(--line);border-radius:50%;background:var(--paper)
 }
@@ -1031,7 +1031,6 @@ $('#flights').innerHTML = TRIP.flights.map(f => `
       <div><small>航班</small><b>${esc(f.flightNo)}</b></div>
       <div><small>航廈</small><b>${esc(f.terminal)}</b></div>
       <div><small>座位</small><b>${esc(f.seat)}</b></div>
-      <div><small>訂位代號</small><b>${esc(f.pnr)}</b></div>
     </footer>
   </article>`).join('');
 
