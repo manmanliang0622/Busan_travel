@@ -1310,27 +1310,80 @@ function renderWx(d, fromCache){
     </div>
     <div class="wx-days">${days}</div>
     ${tripHTML}
-    <p class="live-meta">觀測時間（韓國）${c.time.replace('T',' ')}${fromCache?'・離線快取資料':''}・資料來源：<a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo</a>（CC BY 4.0）</p>`;
+    <p class="live-meta">觀測時間（韓國）${c.time.replace('T',' ')}${fromCache?'・離線快取資料':''}・資料來源：${d.source === 'wttr'
+      ? '<a href="https://wttr.in/" target="_blank" rel="noopener">wttr.in</a>（Open-Meteo 暫時連不上，改用備援來源，只有 3 天預報）'
+      : '<a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo</a>（CC BY 4.0）'}</p>`;
+}
+
+/* 天氣來源：先試 Open-Meteo 兩次（20 秒逾時），都失敗再用 wttr.in 備援 */
+const OM_URL = 'https://api.open-meteo.com/v1/forecast?latitude=' + BUSAN.lat + '&longitude=' + BUSAN.lon +
+  '&current=temperature_2m,apparent_temperature,relative_humidity_2m,weather_code,wind_speed_10m,is_day' +
+  '&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max' +
+  '&timezone=Asia%2FSeoul&forecast_days=16';
+async function fetchWx(){
+  for (let i = 0; i < 2; i++){
+    try {
+      const d = await getJSON(OM_URL, 20000);
+      if (d && d.current && d.daily) return d;
+    } catch(e){ /* 下一次 */ }
+  }
+  return fromWttr(await getJSON('https://wttr.in/Busan?format=j1', 20000));
+}
+/* wttr.in 用 WWO 天氣代碼，轉成 WMO 代碼後沿用同一個畫面 */
+function wwoToWmo(c){
+  c = +c;
+  if (c === 113) return 0;
+  if (c === 116) return 2;
+  if (c === 119 || c === 122) return 3;
+  if ([143,248,260].includes(c)) return 45;
+  if ([263,266,281,284].includes(c)) return 51;
+  if ([353,356,359].includes(c)) return 80;
+  if ([200,386,389,392,395].includes(c)) return 95;
+  if ([179,227,230,323,326,329,332,335,338,368,371,182,185,317,320,350,362,365,374,377].includes(c)) return 71;
+  if (c >= 176) return 61;
+  return 3;
+}
+function fromWttr(w){
+  const cc = w && w.current_condition && w.current_condition[0];
+  if (!cc || !Array.isArray(w.weather)) throw new Error('格式不符');
+  const now = new Date(Date.now() + 9*3600*1000); // 韓國時間
+  const hh = now.getUTCHours();
+  const days = w.weather;
+  const rain = d => Math.max(0, ...(d.hourly || []).map(h => +h.chanceofrain || 0));
+  const mid = d => (d.hourly && d.hourly[4] && d.hourly[4].weatherCode) || cc.weatherCode;
+  return {
+    source: 'wttr',
+    current: {
+      time: now.toISOString().slice(0,16),
+      temperature_2m: +cc.temp_C, apparent_temperature: +cc.FeelsLikeC,
+      relative_humidity_2m: +cc.humidity, wind_speed_10m: +cc.windspeedKmph,
+      weather_code: wwoToWmo(cc.weatherCode), is_day: hh >= 7 && hh < 18 ? 1 : 0
+    },
+    daily: {
+      time: days.map(d => d.date),
+      weather_code: days.map(d => wwoToWmo(mid(d))),
+      temperature_2m_max: days.map(d => +d.maxtempC),
+      temperature_2m_min: days.map(d => +d.mintempC),
+      precipitation_probability_max: days.map(rain)
+    }
+  };
 }
 
 async function loadWx(force){
   const btn = $('#wxRefresh'), cached = cacheGet('busan-wx');
+  if (btn.disabled) return; // 上一次還在連線
   if (!force && cached && Date.now() - cached.at < WX_TTL){ renderWx(cached.data); return; }
   busy(btn, true);
-  const url = 'https://api.open-meteo.com/v1/forecast?latitude=' + BUSAN.lat + '&longitude=' + BUSAN.lon +
-    '&current=temperature_2m,apparent_temperature,relative_humidity_2m,weather_code,wind_speed_10m,is_day' +
-    '&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max' +
-    '&timezone=Asia%2FSeoul&forecast_days=16';
+  if (!cached) $('#wxBody').innerHTML = '<div class="skel" style="width:60%"></div><div class="skel"></div><div class="live-meta" style="margin:6px 0 0">連線中…</div>';
   try {
-    const data = await getJSON(url);
-    if (!data.current || !data.daily) throw new Error('格式不符');
+    const data = await fetchWx();
     cacheSet('busan-wx', { at: Date.now(), data });
     renderWx(data);
   } catch(e){
     if (cached) renderWx(cached.data, true);
     else $('#wxBody').innerHTML = inArtifact
       ? `<div class="live-err">claude.ai 上的頁面不能連到外部天氣服務，所以這裡看不到即時天氣。請用 GitHub 上的網頁版開啟，或直接查 <a href="https://open-meteo.com/en/docs#latitude=35.1796&longitude=129.0756&timezone=Asia%2FSeoul" target="_blank" rel="noopener">Open-Meteo</a>、Naver 天氣。</div>`
-      : `<div class="live-err">暫時抓不到天氣資料（${esc(e.message || '連線失敗')}），請稍後按「更新」再試。</div>`;
+      : `<div class="live-err">暫時抓不到天氣資料（${e && e.name === 'AbortError' ? '連線逾時' : esc(e && e.message || '連線失敗')}），請稍後按「更新」再試。</div>`;
   } finally { busy(btn, false); }
 }
 
